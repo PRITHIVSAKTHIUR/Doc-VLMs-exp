@@ -23,6 +23,28 @@ The Video Information Retrieval and Extraction Expert model is a fine-tuned vers
 ### olmOCR-7B-0225
 Based on Qwen2-VL-7B, this model is optimized for document-level optical character recognition (OCR), long-context vision-language understanding, and accurate image-to-text conversion with mathematical LaTeX formatting. Designed with a focus on high-fidelity visual-textual comprehension.
 
+
+## Markdown (.MD) - Inference 
+
+![t606umgwNTtKxii094rn3](https://github.com/user-attachments/assets/b30e07e6-589f-4baa-9871-32feba1f1654)
+
+
+---
+
+![68747470733a2f2f63646e2d75706c6f6164732e68756767696e67666163652e636f2f70726f64756374696f6e2f75706c6f6164732f3635626238333764626662383738663436633737646534632f6b5f4e394e707062616b426f34694a4d374c4a6e522e706e67](https://github.com/user-attachments/assets/e85842c5-fb51-4e13-917f-c02bf8318adb)
+
+---
+
+## Demo Inference
+
+https://github.com/user-attachments/assets/fb713267-05b9-4984-9323-3b7f770078b5
+
+---
+
+https://github.com/user-attachments/assets/d595851a-3f26-4a0b-af27-de4a9e2ef8fe
+
+---
+
 ## Installation
 
 1. Clone the repository:
