@@ -241,7 +241,7 @@ css = """
 
 # Create the Gradio Interface
 with gr.Blocks(css=css, theme="bethecloud/storj_theme") as demo:
-    gr.Markdown("# **[Doc VLMs](https://huggingface.co/collections/prithivMLmods/multimodal-implementations-67c9982ea04b39f0608badb0)**")
+    gr.Markdown("# **[Doc VLMs OCR](https://huggingface.co/collections/prithivMLmods/multimodal-implementations-67c9982ea04b39f0608badb0)**")
     with gr.Row():
         with gr.Column():
             with gr.Tabs():
