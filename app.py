@@ -210,6 +210,15 @@ def generate_video(model_name: str, text: str, video_path: str,
         time.sleep(0.01)
         yield buffer, buffer
 
+def save_to_md(output_text):
+    """
+    Saves the output text to a Markdown file and returns the file path for download.
+    """
+    file_path = f"result_{uuid.uuid4()}.md"
+    with open(file_path, "w") as f:
+        f.write(output_text)
+    return file_path
+
 # Define examples for image and video inference
 image_examples = [
     ["Convert this page to doc [text] precisely.", "images/3.png"],
@@ -261,6 +270,7 @@ with gr.Blocks(css=css, theme="bethecloud/storj_theme") as demo:
                         examples=video_examples,
                         inputs=[video_query, video_upload]
                     )
+                    
             with gr.Accordion("Advanced options", open=False):
                 max_new_tokens = gr.Slider(label="Max new tokens", minimum=1, maximum=MAX_MAX_NEW_TOKENS, step=1, value=DEFAULT_MAX_NEW_TOKENS)
                 temperature = gr.Slider(label="Temperature", minimum=0.1, maximum=4.0, step=0.1, value=0.6)
@@ -270,10 +280,13 @@ with gr.Blocks(css=css, theme="bethecloud/storj_theme") as demo:
 
         with gr.Column():
             with gr.Column(elem_classes="canvas-output"):
-                gr.Markdown("## Result Canvas")
+                gr.Markdown("## Result.Md")
                 output = gr.Textbox(label="Raw Output Stream", interactive=False, lines=2)
-                markdown_output = gr.Markdown(label="Formatted Result (Result.Md)")
 
+                with gr.Accordion("Formatted Result (Result.md)", open=False):                
+                    markdown_output = gr.Markdown(label="Formatted Result (Result.Md)")
+                #download_btn = gr.Button("Download Result.md"
+                
             model_choice = gr.Radio(
                 choices=["DREX-062225-7B-exp", "olmOCR-7B-0225-preview", "VIREX-062225-7B-exp", "Typhoon-OCR-3B"],
                 label="Select Model",
@@ -297,6 +310,11 @@ with gr.Blocks(css=css, theme="bethecloud/storj_theme") as demo:
         inputs=[model_choice, video_query, video_upload, max_new_tokens, temperature, top_p, top_k, repetition_penalty],
         outputs=[output, markdown_output]
     )
+#    download_btn.click(
+#        fn=save_to_md,
+#        inputs=output,
+#        outputs=None
+#    )
 
 if __name__ == "__main__":
     demo.queue(max_size=30).launch(share=True, mcp_server=True, ssr_mode=False, show_error=True)
