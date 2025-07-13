@@ -29,15 +29,6 @@ MAX_INPUT_TOKEN_LENGTH = int(os.getenv("MAX_INPUT_TOKEN_LENGTH", "4096"))
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# Load VIREX-062225-exp
-MODEL_ID_M = "prithivMLmods/VIREX-062225-exp"
-processor_m = AutoProcessor.from_pretrained(MODEL_ID_M, trust_remote_code=True)
-model_m = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-    MODEL_ID_M,
-    trust_remote_code=True,
-    torch_dtype=torch.float16
-).to(device).eval()
-
 # Load DREX-062225-exp
 MODEL_ID_X = "prithivMLmods/DREX-062225-exp"
 processor_x = AutoProcessor.from_pretrained(MODEL_ID_X, trust_remote_code=True)
@@ -61,6 +52,15 @@ MODEL_ID_O = "allenai/olmOCR-7B-0225-preview"
 processor_o = AutoProcessor.from_pretrained(MODEL_ID_O, trust_remote_code=True)
 model_o = Qwen2VLForConditionalGeneration.from_pretrained(
     MODEL_ID_O,
+    trust_remote_code=True,
+    torch_dtype=torch.float16
+).to(device).eval()
+
+# Load typhoon-ocr-3b
+MODEL_ID_J = "prithivMLmods/Megalodon-OCR-Sync-0713"
+processor_j = AutoProcessor.from_pretrained(MODEL_ID_J, trust_remote_code=True)
+model_j = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+    MODEL_ID_J,
     trust_remote_code=True,
     torch_dtype=torch.float16
 ).to(device).eval()
@@ -96,10 +96,7 @@ def generate_image(model_name: str, text: str, image: Image.Image,
     """
     Generates responses using the selected model for image input.
     """
-    if model_name == "VIREX-062225-7B-exp":
-        processor = processor_m
-        model = model_m
-    elif model_name == "DREX-062225-7B-exp":
+    if model_name == "DREX-062225-7B-exp":
         processor = processor_x
         model = model_x
     elif model_name == "olmOCR-7B-0225-preview":
@@ -108,6 +105,9 @@ def generate_image(model_name: str, text: str, image: Image.Image,
     elif model_name == "Typhoon-OCR-3B":
         processor = processor_t
         model = model_t
+    elif model_name == "Megalodon-OCR":
+        processor = processor_j
+        model = model_j
     else:
         yield "Invalid model selected.", "Invalid model selected."
         return
@@ -152,10 +152,7 @@ def generate_video(model_name: str, text: str, video_path: str,
     """
     Generates responses using the selected model for video input.
     """
-    if model_name == "VIREX-062225-7B-exp":
-        processor = processor_m
-        model = model_m
-    elif model_name == "DREX-062225-7B-exp":
+    if model_name == "DREX-062225-7B-exp":
         processor = processor_x
         model = model_x
     elif model_name == "olmOCR-7B-0225-preview":
@@ -164,6 +161,9 @@ def generate_video(model_name: str, text: str, video_path: str,
     elif model_name == "Typhoon-OCR-3B":
         processor = processor_t
         model = model_t
+    elif model_name == "Megalodon-OCR":
+        processor = processor_j
+        model = model_j
     else:
         yield "Invalid model selected.", "Invalid model selected."
         return
@@ -280,22 +280,22 @@ with gr.Blocks(css=css, theme="bethecloud/storj_theme") as demo:
 
         with gr.Column():
             with gr.Column(elem_classes="canvas-output"):
-                gr.Markdown("## Result.Md")
-                output = gr.Textbox(label="Raw Output Stream", interactive=False, lines=2)
+                gr.Markdown("## Output")
+                output = gr.Textbox(label="Raw Output Stream", interactive=False, lines=2, show_copy_button=True)
 
-                with gr.Accordion("Formatted Result (Result.md)", open=False):                
-                    markdown_output = gr.Markdown(label="Formatted Result (Result.Md)")
+                with gr.Accordion("(Result.md)", open=False):                
+                    markdown_output = gr.Markdown(label="(Result.Md)")
                 #download_btn = gr.Button("Download Result.md"
                 
             model_choice = gr.Radio(
-                choices=["DREX-062225-7B-exp", "olmOCR-7B-0225-preview", "VIREX-062225-7B-exp", "Typhoon-OCR-3B"],
+                choices=["DREX-062225-7B-exp", "Megalodon-OCR", "olmOCR-7B-0225-preview", "Typhoon-OCR-3B"],
                 label="Select Model",
                 value="DREX-062225-7B-exp"
             )
 
             gr.Markdown("**Model Info 💻** | [Report Bug](https://huggingface.co/spaces/prithivMLmods/Doc-VLMs/discussions)")          
             gr.Markdown("> [DREX-062225-7B-exp](https://huggingface.co/prithivMLmods/DREX-062225-exp): the drex-062225-exp (document retrieval and extraction expert) model is a specialized fine-tuned version of docscopeocr-7b-050425-exp, optimized for document retrieval, content extraction, and analysis recognition. built on top of the qwen2.5-vl architecture.")
-            gr.Markdown("> [VIREX-062225-7B-exp](https://huggingface.co/prithivMLmods/VIREX-062225-exp): the virex-062225-exp (video information retrieval and extraction expert - experimental) model is a fine-tuned version of qwen2.5-vl-7b-instruct, specifically optimized for advanced video understanding, image comprehension, sense of reasoning, and natural language decision-making through cot reasoning.")
+            gr.Markdown("> [Megalodon-OCR-Sync-0713](https://huggingface.co/prithivMLmods/Megalodon-OCR-Sync-0713): megalodon-ocr-sync-0713 model is a fine-tuned version of qwen2.5-vl-3b-instruct, optimized for document retrieval, content extraction, and analysis recognition. built on top of the qwen2.5-vl architecture, this model enhances document comprehension capabilities.")
             gr.Markdown("> [Typhoon-OCR-3B](https://huggingface.co/scb10x/typhoon-ocr-3b): a bilingual document parsing model built specifically for real-world documents in thai and english, inspired by models like olmocr, based on qwen2.5-vl-instruction. this model is intended to be used with a specific prompt only.")
             gr.Markdown("> [olmOCR-7B-0225](https://huggingface.co/allenai/olmOCR-7B-0225-preview): the olmocr-7b-0225-preview model is based on qwen2-vl-7b, optimized for document-level optical character recognition (ocr), long-context vision-language understanding, and accurate image-to-text conversion with mathematical latex formatting. designed with a focus on high-fidelity visual-textual comprehension.")
             gr.Markdown(">⚠️note: all the models in space are not guaranteed to perform well in video inference use cases.")  
